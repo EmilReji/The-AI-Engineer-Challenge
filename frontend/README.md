@@ -55,8 +55,27 @@ Run these from `frontend/`:
 ```bash
 npm run lint
 npm run typecheck
+npm run test:run
 npm run build
 ```
+
+Use `npm test` while developing to keep Vitest running in watch mode. The focused component suite mocks the browser request boundary, so it never contacts FastAPI or consumes OpenAI quota.
+
+## Local commit gate
+
+Enable the repository's version-controlled Git hooks once per clone, from the repository root:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Before each commit, the hook runs the same fast checks available manually from `frontend/`:
+
+```bash
+npm run check:commit
+```
+
+The gate runs ESLint, strict TypeScript checking, the non-watch component tests, and Git's whitespace/error check. It intentionally leaves the slower production build as a separate pre-push or deployment check.
 
 Use `npm run start` after a successful build to preview the production build locally. Keep the FastAPI process running because the production Next.js server uses the same proxy configuration.
 
