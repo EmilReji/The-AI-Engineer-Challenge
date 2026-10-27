@@ -53,13 +53,11 @@ Restart `npm run dev` after changing the environment file. `FASTAPI_ORIGIN` is i
 Run these from `frontend/`:
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test:run
+npm run verify
 npm run build
 ```
 
-Use `npm test` while developing to keep Vitest running in watch mode. The focused component suite mocks the browser request boundary, so it never contacts FastAPI or consumes OpenAI quota.
+`npm run verify` runs ESLint, strict TypeScript checking, and the component suite. `npm run build` starts with that same verification gate and only runs the Next.js production build after every check passes. Use `npm test` while developing to keep Vitest running in watch mode. The focused component suite mocks the browser request boundary, so it never contacts FastAPI or consumes OpenAI quota.
 
 ## Local commit gate
 
@@ -75,12 +73,14 @@ Before each commit, the hook runs the same fast checks available manually from `
 npm run check:commit
 ```
 
-The gate runs ESLint, strict TypeScript checking, the non-watch component tests, and Git's whitespace/error check. It intentionally leaves the slower production build as a separate pre-push or deployment check.
+The gate runs the shared verification command plus Git's staged whitespace/error check. It intentionally leaves the slower production build as a deployment check.
 
 Use `npm run start` after a successful build to preview the production build locally. Keep the FastAPI process running because the production Next.js server uses the same proxy configuration.
 
 ## Vercel routing
 
 The root `vercel.json` defines two Vercel Services. Requests under `/api/*` reach the FastAPI service with their original paths, and all other requests reach this Next.js service. This gives the browser one same-origin `/api/chat` URL in both local development and deployment.
+
+Vercel uses the frontend's `npm run build` script. That script runs linting, TypeScript, and all component tests before `next build`; any failed check stops the command and causes the deployment build to fail. Successful build logs should show `npm run verify`, `12 passed`, and then the Next.js production build.
 
 Set `OPENAI_API_KEY` as a server-side environment variable in the Vercel project. The frontend requires no public API key and no browser-visible backend origin.

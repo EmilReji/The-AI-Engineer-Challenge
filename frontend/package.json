@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "verify": "npm run lint && npm run typecheck && npm run test:run",
+    "build": "npm run verify && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "check:commit": "npm run lint && npm run typecheck && npm run test:run && git -C .. diff --cached --check"
+    "check:commit": "npm run verify && git -C .. diff --cached --check"
   },
   "dependencies": {
     "next": "^16.4.3",
